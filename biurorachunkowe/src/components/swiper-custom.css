@@ -1,0 +1,39 @@
+/* Własne style dla karuzeli Swiper */
+
+.swiper-container {
+	overflow: hidden;
+	position: relative;
+}
+
+.swiper-wrapper {
+	will-change: transform;
+}
+
+/* Płynne przejście bez zatrzymań */
+.swiper-container .swiper-wrapper {
+	transition-timing-function: linear !important;
+}
+
+/* Dodatkowy styl, aby karuzela nie migała podczas przewijania */
+.swiper-slide {
+	height: auto;
+	backface-visibility: hidden;
+	transform: translateZ(0);
+	-webkit-backface-visibility: hidden;
+	-webkit-transform: translateZ(0);
+}
+
+/* Usunięcie migającego efektu przy przechodzeniu między slajdami */
+.swiper-slide-duplicate {
+	backface-visibility: hidden;
+	transform: translateZ(0);
+	-webkit-backface-visibility: hidden;
+	-webkit-transform: translateZ(0);
+}
+
+/* Wyłączenie migania przy animacji */
+.mySwiper {
+	will-change: transform;
+	backface-visibility: hidden;
+	transform-style: preserve-3d;
+}

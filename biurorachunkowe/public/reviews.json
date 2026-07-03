@@ -1,0 +1,53 @@
+{
+	"reviews": [
+		{
+			"author_name": "Anna Kieżuń",
+			"profile_photo_url": "https://randomuser.me/api/portraits/women/1.jpg",
+			"rating": 5,
+			"text": "Współpraca z Panią Ewą to czysta przyjemność. Profesjonalizm, rzetelność i terminowość idą w parze z ogromnym zaangażowaniem. Pani Ewa potrafi w prosty sposób wyjaśnić nawet najbardziej skomplikowane kwestie podatkowe, co daje mi poczucie bezpieczeństwa i pewność, że moje finanse są w najlepszych rękach.",
+			"time": 1713598800
+		},
+		{
+			"author_name": "Moncia Pe",
+			"profile_photo_url": "https://randomuser.me/api/portraits/men/2.jpg",
+			"rating": 5,
+			"text": "Świetna obsługa i szybki kontakt. Polecam ze względu na profesjonalizm, terminowość oraz indywidualne podejście do Klienta. Pani Ewa ma ogromną wiedzę w temacie, zaangażowanie i cierpliwość do tłumaczenia zawiłości księgowych.",
+			"time": 1712821200
+		},
+		{
+			"author_name": "Małgorzata Torbińska",
+			"profile_photo_url": "https://randomuser.me/api/portraits/women/3.jpg",
+			"rating": 4,
+			"text": "Z całego serca polecam Panią Ewę. Osoba bardzo rzeczowa, kompetentna, z dużą wiedzą. 😊",
+			"time": 1711957200
+		},
+		{
+			"author_name": "Julia Pryjma",
+			"profile_photo_url": "https://randomuser.me/api/portraits/women/7.jpg",
+			"rating": 5,
+			"text": "Profesjonalna pomoc i doradztwo przy zakładaniu JDG, zawsze szybki i miły kontakt, pełna terminowość. Polecam! :)",
+			"time": 1711352400
+		},
+		{
+			"author_name": "Robert Góralczyk",
+			"profile_photo_url": "https://randomuser.me/api/portraits/men/4.jpg",
+			"rating": 5,
+			"text": "Szybki kontakt i indywidualne podejście do klienta, o to mi chodziło. A przy tym aktualna wiedza Pani Ewy. Polecam 🫡",
+			"time": 1711352400
+		},
+		{
+			"author_name": "Anita Czaplicka",
+			"profile_photo_url": "https://randomuser.me/api/portraits/women/9.jpg",
+			"rating": 5,
+			"text": "Bardzo polecam, super kontakt i wszystko profesjonalnie!",
+			"time": 1711352400
+		},
+		{
+			"author_name": "Monika Pragaśs",
+			"profile_photo_url": "https://randomuser.me/api/portraits/women/8.jpg",
+			"rating": 5,
+			"text": "Osoba niezwykle odpowiedzialna, kompetentna, zorganizowana oraz w pełni zorientowana na bierzących zmianach. Zaangażowana to mało powiedziane, z czystym sercem polecam mocno panią Ewę 👌👌👌",
+			"time": 1711352400
+		}
+	]
+}

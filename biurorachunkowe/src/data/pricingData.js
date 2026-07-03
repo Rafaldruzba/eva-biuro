@@ -1,0 +1,147 @@
+const pricingData = {
+	title: 'Cennik usług',
+	subtitle: 'Biuro Rachunkowe OnLine',
+	disclaimer: [
+		'Przedstawiony poniżej cennik nie stanowi oferty w rozumieniu art. 66',
+		'Kodeksu Cywilnego. Służy on do wyliczenia kosztów współpracy z biurem.',
+		'Podane ceny usług są cenami brutto.',
+	],
+	sections: [
+		{
+			title: 'Podatkowa Księga Przychodów i Rozchodów oraz ryczałt',
+			headers: ['Ilość dokumentów księgowych', 'Cena Ryczałt/ryczałt + VAT i JPK', 'Cena KPiR/KPiR plus VAT i JPK'],
+			rows: [
+				{
+					documents: 'Do 15 dokumentów',
+					priceRyczalt: '200/210zł',
+					priceKPiR: '200/210zł',
+				},
+				{
+					documents: 'Do 30 dokumentów',
+					priceRyczalt: '260/300zł',
+					priceKPiR: '270/310zł',
+				},
+				{
+					documents: 'Do 50 dokumentów',
+					priceRyczalt: '310/360zł',
+					priceKPiR: '360/410zł',
+				},
+				{
+					documents: 'Do 70 dokumentów',
+					priceRyczalt: '510/560zł',
+					priceKPiR: '560/610zł',
+				},
+				{
+					documents: 'Do 85 dokumentów',
+					priceRyczalt: '710/760zł',
+					priceKPiR: '760/810zł',
+				},
+				{
+					documents: 'Do 100 dokumentów',
+					priceRyczalt: '900/960zł',
+					priceKPiR: '960/1000zł',
+				},
+				{
+					documents: 'Kolejny dokument',
+					priceRyczalt: '3/4zł szt.',
+					priceKPiR: '3/4zł szt.',
+				},
+			],
+		},
+		{
+			title: 'Kadry i płace',
+			headers: ['Rozliczenie', 'Cena'],
+			rows: [
+				{ service: 'Właściciel JDG', price: 'W cenie' },
+				{ service: 'Pracownik umowa o pracę', price: '30zł os. za miesiąc' },
+				{ service: 'Zleceniobiorca', price: '30zł os. za miesiąc' },
+				{ service: 'Umowa o dzieło', price: '30zł os. za miesiąc' },
+				{ service: 'Wspólnik spółki cywilnej', price: '30zł os. za miesiąc' },
+				{ service: 'Założenie akt', price: '30zł os. za miesiąc' },
+				{ service: 'Sporządzenie PIT 11', price: '30zł sztuka' },
+				{ service: 'Sporządzenie zaświadczenia dla pracownika', price: '20zł sztuka' },
+				{ service: 'Rejestracja do PFRON', price: '100zł' },
+				{ service: 'Sporządzenie wniosku o refundację PFRON', price: '100zł' },
+				{ service: 'Sporządzenie umowy o pracę', price: '30zł' },
+				{ service: 'Wystawienie świadectwa pracy', price: '30zł' },
+				{ service: 'Sporządzenie umowy zlecenia', price: '30zł' },
+				{ service: 'Zaświadczenie o zarobkach dla zleceniobiorcy', price: '20zł' },
+				{ service: 'Sporządzenie umowy o dzieło', price: '30zł' },
+				{ service: 'Zgłoszenie RUD', price: '30zł' },
+				{ service: 'Zgłoszenie do ZUS/ Wyrejestrowanie z ZUS', price: '10zł/w cenie' },
+				{ service: 'Naliczanie PPK lista płac', price: '30zł za osobę' },
+				{ service: 'Odliczanie zajęć komorniczych lista płac', price: '30zł sztuka' },
+				{ service: 'Inne nie wymienione odliczenia i naliczenia', price: '20zł' },
+				{ service: 'Korekta deklaracji, naliczenie i zgłoszenie z winy klienta', price: '50zł' },
+				{ service: 'Sporządzenie wniosku o zasiłek opiekuńczy', price: '50zł' },
+				{ service: 'Sporządzenie wniosku o zasiłek chorobowy', price: '50zł' },
+				{ service: 'Sporządzenie wniosku o urlop macierzyński', price: '50zł' },
+				{ service: 'Sporządzenie wniosku o urlop tacierzyński', price: '50zł' },
+				{ service: 'Sporządzenie deklaracji ZUS IWA', price: '100zł' },
+				{ service: 'Powiadomienie o powierzeniu wykonywania pracy cudzoziemcowi', price: '70zł' },
+			],
+		},
+		{
+			title: 'Pozostałe usługi',
+			headers: ['Usługa', 'Cena'],
+			rows: [
+				{
+					service:
+						'Prowadzenie działalności nierejestrowanej (prowadzenie ewidencji, pilnowanie progów przychodowych, złożenie deklaracji rocznej)',
+					price: '150zł za miesiąc',
+				},
+				{ service: 'Pomoc w założeniu JDG', price: 'Gratis' },
+				{ service: 'Przechowywanie dokumentacji', price: 'W cenie' },
+				{ service: 'Przechowywanie dokumentacji po zakończeniu współpracy', price: '50zł za miesiąc' },
+				{ service: 'Roczne zeznanie podatkowe właściciela', price: 'W cenie' },
+				{
+					service:
+						'Roczne zeznanie podatkowe właściciela zawierające dodatkowe dokumenty (np. rozliczenie z małżonkiem, ulgi itp.)',
+					price: '20zł za każdy dodatkowy dokument',
+				},
+				{
+					service: 'Roczne zeznanie podatkowe osoby indywidualnej',
+					price: '70zł za osobę / 90zł rozliczenie wspólne z małżonkiem',
+				},
+				{
+					service: 'Ulga IP BOX (prowadzenie ewidencji + rozliczenie roczne)',
+					price: '150zł/miesiąc',
+				},
+				{ service: 'Wniosek o wydanie zaświadczenia z US/ZUS', price: '30zł sztuka' },
+				{ service: 'Pismo o niezaleganiu z US/ZUS', price: '30zł sztuka' },
+				{ service: 'Sporządzenie deklaracji VAT9M za klienta bez VAT', price: '50zł sztuka' },
+				{ service: 'Sporządzenie deklaracji VAT8 za klienta bez VAT', price: '50zł sztuka' },
+				{ service: 'Sporządzenie/aktualizacja VAT R', price: '50zł sztuka' },
+				{ service: 'Roczne rozliczenie składki zdrowotnej / Klient biura', price: '100zł / 50zł' },
+				{ service: 'Sporządzenie faktury w imieniu klienta', price: '10zł sztuka' },
+				{ service: 'Sporządzenie noty korygującej w imieniu klienta', price: '10zł sztuka' },
+				{ service: 'Sporządzenie wezwania do zapłaty w imieniu klienta', price: '10zł sztuka' },
+				{
+					service: 'Wystawienie wezwania do zapłaty dla klienta, który nie rozlicza się z biurem terminowo',
+					price: '20zł sztuka',
+				},
+				{ service: 'Korekta deklaracji z winy klienta', price: '50zł' },
+				{ service: 'Złożenie zaległej deklaracji', price: '50zł' },
+				{ service: 'Korekta raportów w ZUS', price: '50zł sztuka' },
+				{ service: 'Sporządzenie sprawozdań dla banku, do ubezpieczenia etc.', price: '100zł sztuka' },
+				{ service: 'Sprawozdanie do GUS', price: '50zł za godzinę' },
+				{ service: 'Aktualizacja wpisu w CEiDG', price: 'W cenie' },
+				{ service: 'Pismo wyjaśniające do US/ZUS etc.', price: '40zł za godzinę' },
+				{ service: 'JPK KPiR na żądanie US', price: '70zł' },
+				{ service: 'Korekta JPK', price: '50zł' },
+				{ service: 'Wniosek A1', price: '100zł' },
+				{ service: 'Rozliczenie wniosku A1', price: '100zł' },
+				{ service: 'Usługi świadczone w święta i dni wolne', price: '100zł za godzinę' },
+				{ service: 'Usługi świadczone po godzinach pracy', price: '70zł za godzinę' },
+				{ service: 'Usługi wykraczające poza cennik', price: 'Od 50zł za godzinę (cena ustalana indywidualnie)' },
+				{
+					service:
+						'Zerwanie współpracy w ciągu 2 miesięcy (wdrożenie, baza klientów i wstępne przygotowanie dokumentów)',
+					price: '200zł',
+				},
+			],
+		},
+	],
+}
+
+export default pricingData

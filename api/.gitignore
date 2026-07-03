@@ -1,0 +1,11 @@
+env
+.env
+*.env
+node_modules/
+
+npm-debug.log*
+
+# Cache aplikacji i narzędzi
+.eslintcache
+.npm
+.eslintcache
