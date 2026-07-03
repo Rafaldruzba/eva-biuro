@@ -56,12 +56,11 @@ export default function Contact() {
 		try {
 			setIsLoading(true)
 
-			// Tworzymy czysty obiekt JSON, dopasowany polami do backendu
 			const payload = {
 				firstName: firstName,
 				email: email,
 				phone: phone,
-				message: description, // frontendowy opis mapujemy na backendowy message
+				message: description,
 				subject: `Zgłoszenie od ${firstName}`,
 			}
 
