@@ -7,7 +7,7 @@ import dotenv from 'dotenv'
 dotenv.config()
 
 const app = express()
-app.use(cors({ origin: ['http://localhost:3000', 'https://br-online.pl'], credentials: true }))
+app.use(cors({ origin: ['http://localhost:5173', 'https://br-online.pl'], credentials: true }))
 app.use(express.json()) // Do czytania body w formacie JSON
 
 // Konfiguracja transportera e-mail
@@ -22,7 +22,7 @@ const transporter = nodemailer.createTransport({
 })
 
 app.post('/api/contact', async (req, res) => {
-	const { email, message, subject } = req.body
+	const { email, message, subject, firstName, phone } = req.body
 
 	if (!email) {
 		return res.status(400).json({ error: 'Adres e-mail jest wymagany.' })
@@ -34,8 +34,37 @@ app.post('/api/contact', async (req, res) => {
 			to: process.env.EMAIL_USER,
 			replyTo: email,
 			subject: subject || 'Nowe zgłoszenie ze strony WWW',
-			text: `Od: ${email}\n\nWiadomość:\n${message || 'Brak treści wiadomości.'}`,
-			html: `<p><strong>Od:</strong> ${email}</p><p><strong>Wiadomość:</strong></p><p>${message || 'Brak treści.'}</p>`,
+			text: `Od: ${firstName || 'Nie podano'} (${email})\nTelefon: ${phone || 'Nie podano'}\n\nWiadomość:\n${message || 'Brak treści wiadomości.'}`,
+			html: `
+				<div style='background-color: #fdfdfd; padding: 40px 20px; font-family: 'Segoe UI', Helvetica, Arial, sans-serif; line-height: 1.6;'>
+                <div style='max-width: 500px; margin: 0 auto; background: #ffffff; border: 1px solid #eeeeee; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.02);'>
+                    
+                    <div style='height: 4px; background: linear-gradient(to right, #3498db, #2c3e50);'></div>
+
+                    <div style='padding: 40px 30px;'>
+                        <h2 style='color: #2c3e50; margin-top: 0; font-size: 20px;'>Dzień dobry, $firstName!</h2>
+                        
+                        <p style='color: #4f5f6f; font-size: 15px;'>
+                            Dziękuję za przesłanie formularza i zainteresowanie moimi usługami. Potwierdzam, że Twoja wiadomość dotarła do mnie bezpiecznie.
+                        </p>
+                        
+                        <p style='color: #4f5f6f; font-size: 15px;'>
+                            Zapoznam się z Twoim opisem i postaram się odpowiedzieć tak szybko, jak to możliwe (zazwyczaj zajmuje mi to do 24 godzin).
+                        </p>
+
+                        <div style='margin-top: 40px; padding-top: 20px; border-top: 1px solid #f0f0f0;'>
+                            <p style='margin: 0; color: #2c3e50; font-weight: bold;'>Pozdrawiam,</p>
+                            <p style='margin: 5px 0 0 0; color: #3498db; font-size: 18px; font-family: Georgia, serif;'>Ewa Reluga</p>
+                        </div>
+                    </div>
+
+                    <div style='background-color: #f9f9f9; padding: 20px; text-align: center; font-size: 11px; color: #bdc3c7;'>
+                        To jest automatyczne potwierdzenie otrzymania wiadomości.<br>
+                        Nie musisz na nie odpowiadać.
+                    </div>
+                </div>
+            </div>
+			`,
 		})
 
 		res.status(200).json({ success: true, message: 'Wiadomość została wysłana!' })

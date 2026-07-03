@@ -55,13 +55,18 @@ export default function Contact() {
 
 		try {
 			setIsLoading(true)
-			const formData = new FormData()
-			formData.append('firstName', firstName)
-			formData.append('email', email)
-			formData.append('phone', phone)
-			formData.append('description', description)
 
-			await axios.post('/form-handler.php', formData)
+			// Tworzymy czysty obiekt JSON, dopasowany polami do backendu
+			const payload = {
+				firstName: firstName,
+				email: email,
+				phone: phone,
+				message: description, // frontendowy opis mapujemy na backendowy message
+				subject: `Zgłoszenie od ${firstName}`,
+			}
+
+			// Axios automatycznie wyśle to z nagłówkiem Content-Type: application/json
+			await axios.post('https://gold-cheetah-690946.hostingersite.com/api/contact', payload)
 
 			setStatusMessage('Wiadomość została wysłana pomyślnie!')
 			setIsLoading(false)
@@ -72,7 +77,6 @@ export default function Contact() {
 			setPhone('')
 			setDescription('')
 
-			// Automatyczne czyszczenie komunikatu po 3 sekundach
 			setTimeout(() => {
 				setStatusMessage('')
 			}, 3000)
@@ -234,8 +238,8 @@ export default function Contact() {
 								</div>
 								<button
 									type='submit'
-									disabled
-									// disabled={isLoading}
+									// disabled
+									disabled={isLoading}
 									className='w-full bg-gold text-grayish py-3 cursor-pointer rounded hover:bg-opacity-90 transition-colors disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2'
 									aria-label='Wyślij wiadomość'>
 									{isLoading ? (
@@ -244,8 +248,8 @@ export default function Contact() {
 											<RingLoader color='#4A5568' size={20} />
 										</>
 									) : (
-										// 'Wyślij wiadomość'
-										'W trakcie przebudowy, proszę o kontakt mailowy tradycyjnie'
+										'Wyślij wiadomość'
+										// 'W trakcie przebudowy, proszę o kontakt mailowy tradycyjnie'
 									)}
 								</button>
 								{statusMessage && (
