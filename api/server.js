@@ -8,13 +8,13 @@ dotenv.config()
 
 const app = express()
 app.use(cors({ origin: ['http://localhost:5173', 'https://br-online.pl'], credentials: true }))
-app.use(express.json()) // Do czytania body w formacie JSON
+app.use(express.json())
 
 // Konfiguracja transportera e-mail
 const transporter = nodemailer.createTransport({
 	host: process.env.EMAIL_HOST,
 	port: parseInt(process.env.EMAIL_PORT || '465'),
-	secure: process.env.EMAIL_PORT === '465', // true dla portu 465, false dla innych
+	secure: process.env.EMAIL_PORT === '465',
 	auth: {
 		user: process.env.EMAIL_USER,
 		pass: process.env.EMAIL_PASS,
@@ -29,41 +29,59 @@ app.post('/api/contact', async (req, res) => {
 	}
 
 	try {
+		// 1. MAIL DO CIEBIE (BIURO RACHUNKOWE) - Informacja o nowym kliencie
 		await transporter.sendMail({
 			from: `"Formularz Strony" <${process.env.EMAIL_USER}>`,
-			to: process.env.EMAIL_USER,
-			replyTo: email,
-			subject: subject || 'Nowe zgłoszenie ze strony WWW',
-			text: `Od: ${firstName || 'Nie podano'} (${email})\nTelefon: ${phone || 'Nie podano'}\n\nWiadomość:\n${message || 'Brak treści wiadomości.'}`,
+			to: process.env.EMAIL_USER, // Trafia do Ciebie
+			replyTo: email, // Kliknięcie "Odpowiedz" w programie pocztowym odpisze do klienta
+			subject: subject || `Nowe zgłoszenie od ${firstName || 'Klienta'}`,
+			text: `Masz nową wiadomość z formularza!\n\nImię: ${firstName || 'Nie podano'}\nE-mail: ${email}\nTelefon: ${phone || 'Nie podano'}\n\nWiadomość:\n${message || 'Brak treści wiadomości.'}`,
 			html: `
-				<div style='background-color: #fdfdfd; padding: 40px 20px; font-family: 'Segoe UI', Helvetica, Arial, sans-serif; line-height: 1.6;'>
-                <div style='max-width: 500px; margin: 0 auto; background: #ffffff; border: 1px solid #eeeeee; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.02);'>
-                    
-                    <div style='height: 4px; background: linear-gradient(to right, #3498db, #2c3e50);'></div>
+				<div style="font-family: sans-serif; line-height: 1.5; color: #333;">
+					<h2 style="color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px;">Nowe zgłoszenie ze strony WWW</h2>
+					<p><strong>Imię:</strong> ${firstName || 'Nie podano'}</p>
+					<p><strong>E-mail:</strong> <a href="mailto:${email}">${email}</a></p>
+					<p><strong>Telefon:</strong> ${phone || 'Nie podano'}</p>
+					<p><strong>Wiadomość:</strong></p>
+					<div style="background: #f9f9f9; padding: 15px; border-left: 4px solid #3498db; white-space: pre-wrap;">${message || 'Brak treści wiadomości.'}</div>
+				</div>
+			`,
+		})
 
-                    <div style='padding: 40px 30px;'>
-                        <h2 style='color: #2c3e50; margin-top: 0; font-size: 20px;'>Dzień dobry, $firstName!</h2>
-                        
-                        <p style='color: #4f5f6f; font-size: 15px;'>
-                            Dziękuję za przesłanie formularza i zainteresowanie moimi usługami. Potwierdzam, że Twoja wiadomość dotarła do mnie bezpiecznie.
-                        </p>
-                        
-                        <p style='color: #4f5f6f; font-size: 15px;'>
-                            Zapoznam się z Twoim opisem i postaram się odpowiedzieć tak szybko, jak to możliwe (zazwyczaj zajmuje mi to do 24 godzin).
-                        </p>
+		// 2. MAIL DO KLIENTA - Automatyczne potwierdzenie (Twój ładny szablon HTML)
+		await transporter.sendMail({
+			from: `"Biuro Rachunkowe Ewa Reluga" <${process.env.EMAIL_USER}>`,
+			to: email, // Trafia do klienta, który wypełnił formularz
+			subject: 'Potwierdzenie otrzymania wiadomości',
+			html: `
+				<div style="background-color: #fdfdfd; padding: 40px 20px; font-family: 'Segoe UI', Helvetica, Arial, sans-serif; line-height: 1.6;">
+					<div style="max-width: 500px; margin: 0 auto; background: #ffffff; border: 1px solid #eeeeee; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.02);">
+						
+						<div style="height: 4px; background: linear-gradient(to right, #3498db, #2c3e50);"></div>
 
-                        <div style='margin-top: 40px; padding-top: 20px; border-top: 1px solid #f0f0f0;'>
-                            <p style='margin: 0; color: #2c3e50; font-weight: bold;'>Pozdrawiam,</p>
-                            <p style='margin: 5px 0 0 0; color: #3498db; font-size: 18px; font-family: Georgia, serif;'>Ewa Reluga</p>
-                        </div>
-                    </div>
+						<div style="padding: 40px 30px;">
+							<h2 style="color: #2c3e50; margin-top: 0; font-size: 20px;">Dzień dobry, ${firstName || 'Szanowny Kliencie'}!</h2>
+							
+							<p style="color: #4f5f6f; font-size: 15px;">
+								Dziękuję za przesłanie formularza i zainteresowanie moimi usługami. Potwierdzam, że Twoja wiadomość dotarła do mnie bezpiecznie.
+							</p>
+							
+							<p style="color: #4f5f6f; font-size: 15px;">
+								Zapoznam się z Twoim opisem i postaram się odpowiedzieć tak szybko, jak to możliwe (zazwyczaj zajmuje mi to do 24 godzin).
+							</p>
 
-                    <div style='background-color: #f9f9f9; padding: 20px; text-align: center; font-size: 11px; color: #bdc3c7;'>
-                        To jest automatyczne potwierdzenie otrzymania wiadomości.<br>
-                        Nie musisz na nie odpowiadać.
-                    </div>
-                </div>
-            </div>
+							<div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #f0f0f0;">
+								<p style="margin: 0; color: #2c3e50; font-weight: bold;">Pozdrawiam,</p>
+								<p style="margin: 5px 0 0 0; color: #3498db; font-size: 18px; font-family: Georgia, serif;">Ewa Reluga</p>
+							</div>
+						</div>
+
+						<div style="background-color: #f9f9f9; padding: 20px; text-align: center; font-size: 11px; color: #bdc3c7;">
+							To jest automatyczne potwierdzenie otrzymania wiadomości.<br>
+							Nie musisz na nie odpowiadać.
+						</div>
+					</div>
+				</div>
 			`,
 		})
 
