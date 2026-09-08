@@ -99,41 +99,41 @@ app.post('/api/contact', contactLimiter, async (req, res) => {
                 </div>
             `,
 			}),
-			// Autoresponder do klienta
-			transporter.sendMail({
-				from: `"Biuro Rachunkowe Ewa Reluga" <${process.env.EMAIL_USER}>`,
-				to: email,
-				subject: 'Potwierdzenie otrzymania wiadomości',
-				html: `
-                <div style="background-color: #fdfdfd; padding: 40px 20px; font-family: 'Segoe UI', Helvetica, Arial, sans-serif; line-height: 1.6;">
-                    <div style="max-width: 500px; margin: 0 auto; background: #ffffff; border: 1px solid #eeeeee; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.02);">
-                        
-                        <div style="height: 4px; background: linear-gradient(to right, #3498db, #2c3e50);"></div>
+			// // Autoresponder do klienta
+			// transporter.sendMail({
+			// 	from: `"Biuro Rachunkowe Ewa Reluga" <${process.env.EMAIL_USER}>`,
+			// 	to: email,
+			// 	subject: 'Potwierdzenie otrzymania wiadomości',
+			// 	html: `
+			//     <div style="background-color: #fdfdfd; padding: 40px 20px; font-family: 'Segoe UI', Helvetica, Arial, sans-serif; line-height: 1.6;">
+			//         <div style="max-width: 500px; margin: 0 auto; background: #ffffff; border: 1px solid #eeeeee; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.02);">
 
-                        <div style="padding: 40px 30px;">
-                            <h2 style="color: #2c3e50; margin-top: 0; font-size: 20px;">Dzień dobry, ${firstName || 'Szanowny Kliencie'}!</h2>
-                            
-                            <p style="color: #4f5f6f; font-size: 15px;">
-                                Dziękuję za przesłanie formularza i zainteresowanie moimi usługami. Potwierdzam, że Twoja wiadomość dotarła do mnie bezpiecznie.
-                            </p>
-                            
-                            <p style="color: #4f5f6f; font-size: 15px;">
-                                Zapoznam się z Twoim opisem i postaram się odpowiedzieć tak szybko, jak to możliwe (zazwyczaj zajmuje mi to do 24 godzin).
-                            </p>
+			//             <div style="height: 4px; background: linear-gradient(to right, #3498db, #2c3e50);"></div>
 
-                            <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #f0f0f0;">
-                                <p style="margin: 0; color: #2c3e50; font-weight: bold;">Pozdrawiam,</p>
-                                <p style="margin: 5px 0 0 0; color: #3498db; font-size: 18px; font-family: Georgia, serif;">Ewa Reluga</p>
-                            </div>
-                        </div>
+			//             <div style="padding: 40px 30px;">
+			//                 <h2 style="color: #2c3e50; margin-top: 0; font-size: 20px;">Dzień dobry, ${firstName || 'Szanowny Kliencie'}!</h2>
 
-                        <div style="background-color: #f9f9f9; padding: 20px; text-align: center; font-size: 11px; color: #bdc3c7;">
-                            Nie odpowiadaj na tę wiadomość.
-                        </div>
-                    </div>
-                </div>
-            `,
-			}),
+			//                 <p style="color: #4f5f6f; font-size: 15px;">
+			//                     Dziękuję za przesłanie formularza i zainteresowanie moimi usługami. Potwierdzam, że Twoja wiadomość dotarła do mnie bezpiecznie.
+			//                 </p>
+
+			//                 <p style="color: #4f5f6f; font-size: 15px;">
+			//                     Zapoznam się z Twoim opisem i postaram się odpowiedzieć tak szybko, jak to możliwe (zazwyczaj zajmuje mi to do 24 godzin).
+			//                 </p>
+
+			//                 <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #f0f0f0;">
+			//                     <p style="margin: 0; color: #2c3e50; font-weight: bold;">Pozdrawiam,</p>
+			//                     <p style="margin: 5px 0 0 0; color: #3498db; font-size: 18px; font-family: Georgia, serif;">Ewa Reluga</p>
+			//                 </div>
+			//             </div>
+
+			//             <div style="background-color: #f9f9f9; padding: 20px; text-align: center; font-size: 11px; color: #bdc3c7;">
+			//                 Nie odpowiadaj na tę wiadomość.
+			//             </div>
+			//         </div>
+			//     </div>
+			// `,
+			// }),
 		]).then(results => {
 			results.forEach((result, idx) => {
 				if (result.status === 'rejected') {
