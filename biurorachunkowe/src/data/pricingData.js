@@ -12,7 +12,7 @@ const pricingData = {
 			headers: ['Ilość dokumentów księgowych', 'Cena Ryczałt/ryczałt + VAT i JPK', 'Cena KPiR/KPiR plus VAT i JPK'],
 			rows: [
 				{
-					documents: 'Do 15 dokumentów',
+					documents: 'Do 10 dokumentów',
 					priceRyczalt: '200/210zł',
 					priceKPiR: '200/210zł',
 				},
