@@ -7,6 +7,9 @@ import rateLimit from 'express-rate-limit'
 
 dotenv.config()
 
+console.log('Wczytano zmienne środowiskowe:', {
+	RECAPTCHA_SECRET_KEY: process.env.RECAPTCHA_SECRET_KEY,
+})
 const app = express()
 
 // Włączamy odczyt prawdziwego IP użytkownika z nagłówków proxy Hostingera
@@ -68,8 +71,11 @@ app.post('/api/contact', contactLimiter, async (req, res) => {
 			},
 		})
 
+		console.log('Odpowiedź z Google reCAPTCHA:', googleRes.data)
+
 		// Odrzucamy boty (score poniżej 0.5 oznacza wysokie prawdopodobieństwo bota)
 		if (!googleRes.data.success || googleRes.data.score < 0.5) {
+			console.log('Odrzucono! Score:', googleRes.data.score, 'Błędy:', googleRes.data['error-codes'])
 			return res.status(400).json({ error: 'Weryfikacja antyspamowa nie powiodła się.' })
 		}
 
@@ -122,8 +128,7 @@ app.post('/api/contact', contactLimiter, async (req, res) => {
                         </div>
 
                         <div style="background-color: #f9f9f9; padding: 20px; text-align: center; font-size: 11px; color: #bdc3c7;">
-                            To jest automatyczne potwierdzenie otrzymania wiadomości.<br>
-                            Nie musisz na nie odpowiadać.
+                            Nie odpowiadaj na tę wiadomość.
                         </div>
                     </div>
                 </div>
