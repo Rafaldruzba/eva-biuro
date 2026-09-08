@@ -17,6 +17,7 @@ app.use(express.json())
 
 // ENDPOINT: Health Check (Sprawdzanie stanu serwera)
 app.get('/api/health', (req, res) => {
+	console.log('Health check endpoint accessed.')
 	res.status(200).json({
 		status: 'UP',
 		timestamp: new Date().toISOString(),
