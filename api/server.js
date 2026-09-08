@@ -7,9 +7,6 @@ import rateLimit from 'express-rate-limit'
 
 dotenv.config()
 
-console.log('Wczytano zmienne środowiskowe:', {
-	RECAPTCHA_SECRET_KEY: process.env.RECAPTCHA_SECRET_KEY,
-})
 const app = express()
 
 // Włączamy odczyt prawdziwego IP użytkownika z nagłówków proxy Hostingera
@@ -18,9 +15,8 @@ app.set('trust proxy', 1)
 app.use(cors({ origin: ['http://localhost:5173', 'https://br-online.pl'], credentials: true }))
 app.use(express.json())
 
-// ENDPOINT: Health Check (Sprawdzanie stanu serwera)
+// ENDPOINT: Health Check
 app.get('/api/health', (req, res) => {
-	console.log('Health check endpoint accessed.')
 	res.status(200).json({
 		status: 'UP',
 		timestamp: new Date().toISOString(),
@@ -28,8 +24,7 @@ app.get('/api/health', (req, res) => {
 	})
 })
 
-// 1. OGRANICZENIE IP (Rate Limiting)
-// Maksymalnie 3 wysłane formularze z jednego adresu IP na 15 minut
+// OGRANICZENIE IP (Rate Limiting) - max 3 zgłoszenia na 15 min
 const contactLimiter = rateLimit({
 	windowMs: 15 * 60 * 1000,
 	max: 3,
@@ -39,10 +34,11 @@ const contactLimiter = rateLimit({
 })
 
 // Konfiguracja transportera e-mail
+const mailPort = parseInt(process.env.EMAIL_PORT || '465', 10)
 const transporter = nodemailer.createTransport({
 	host: process.env.EMAIL_HOST,
-	port: parseInt(process.env.EMAIL_PORT || '465'),
-	secure: process.env.EMAIL_PORT === '465',
+	port: mailPort,
+	secure: mailPort === 465,
 	auth: {
 		user: process.env.EMAIL_USER,
 		pass: process.env.EMAIL_PASS,
@@ -53,7 +49,6 @@ const transporter = nodemailer.createTransport({
 app.post('/api/contact', contactLimiter, async (req, res) => {
 	const { email, message, subject, firstName, phone, recaptchaToken } = req.body
 
-	// Podstawowa walidacja pól
 	if (!email) {
 		return res.status(400).json({ error: 'Adres e-mail jest wymagany.' })
 	}
@@ -63,7 +58,7 @@ app.post('/api/contact', contactLimiter, async (req, res) => {
 	}
 
 	try {
-		// 2. WERYFIKACJA RECAPTCHA V3 W GOOGLE
+		// WERYFIKACJA RECAPTCHA V3 W GOOGLE
 		const googleRes = await axios.post('https://www.google.com/recaptcha/api/siteverify', null, {
 			params: {
 				secret: process.env.RECAPTCHA_SECRET_KEY,
@@ -71,23 +66,26 @@ app.post('/api/contact', contactLimiter, async (req, res) => {
 			},
 		})
 
-		console.log('Odpowiedź z Google reCAPTCHA:', googleRes.data)
-
-		// Odrzucamy boty (score poniżej 0.5 oznacza wysokie prawdopodobieństwo bota)
 		if (!googleRes.data.success || googleRes.data.score < 0.5) {
-			console.log('Odrzucono! Score:', googleRes.data.score, 'Błędy:', googleRes.data['error-codes'])
+			console.warn('Odrzucono formularz przez reCAPTCHA. Score:', googleRes.data.score)
 			return res.status(400).json({ error: 'Weryfikacja antyspamowa nie powiodła się.' })
 		}
 
-		// Poczta wysyła się równolegle
+		const safeSubject = subject || `Nowe zgloszenie od: ${firstName || 'Klient'}`
+
+		// Wysyłka wiadomości równolegle
 		Promise.allSettled([
-			// Mail do biura
+			// Mail 1: Powiadomienie do biura
 			transporter.sendMail({
-				from: process.env.EMAIL_USER,
+				from: `"Formularz BR-Online" <${process.env.EMAIL_USER}>`,
 				to: process.env.EMAIL_USER,
 				replyTo: email,
-				subject: subject || `Nowe zgłoszenie od ${firstName || 'Klienta'}`,
-				text: `Masz nową wiadomość z formularza!\n\nImię: ${firstName || 'Nie podano'}\nE-mail: ${email}\nTelefon: ${phone || 'Nie podano'}\n\nWiadomość:\n${message || 'Brak treści wiadomości.'}`,
+				subject: safeSubject,
+				headers: {
+					'Auto-Submitted': 'auto-generated',
+					'X-Entity-Ref-ID': `admin-${Date.now()}`,
+				},
+				text: `Masz nowa wiadomosc z formularza!\n\nImię: ${firstName || 'Nie podano'}\nE-mail: ${email}\nTelefon: ${phone || 'Nie podano'}\n\nWiadomosc:\n${message || 'Brak treści wiadomości.'}`,
 				html: `
                 <div style="font-family: sans-serif; line-height: 1.5; color: #333;">
                     <h2 style="color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px;">Nowe zgłoszenie ze strony WWW</h2>
@@ -99,41 +97,40 @@ app.post('/api/contact', contactLimiter, async (req, res) => {
                 </div>
             `,
 			}),
-			// // Autoresponder do klienta
-			// transporter.sendMail({
-			// 	from: `"Biuro Rachunkowe Ewa Reluga" <${process.env.EMAIL_USER}>`,
-			// 	to: email,
-			// 	subject: 'Potwierdzenie otrzymania wiadomości',
-			// 	html: `
-			//     <div style="background-color: #fdfdfd; padding: 40px 20px; font-family: 'Segoe UI', Helvetica, Arial, sans-serif; line-height: 1.6;">
-			//         <div style="max-width: 500px; margin: 0 auto; background: #ffffff; border: 1px solid #eeeeee; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.02);">
-
-			//             <div style="height: 4px; background: linear-gradient(to right, #3498db, #2c3e50);"></div>
-
-			//             <div style="padding: 40px 30px;">
-			//                 <h2 style="color: #2c3e50; margin-top: 0; font-size: 20px;">Dzień dobry, ${firstName || 'Szanowny Kliencie'}!</h2>
-
-			//                 <p style="color: #4f5f6f; font-size: 15px;">
-			//                     Dziękuję za przesłanie formularza i zainteresowanie moimi usługami. Potwierdzam, że Twoja wiadomość dotarła do mnie bezpiecznie.
-			//                 </p>
-
-			//                 <p style="color: #4f5f6f; font-size: 15px;">
-			//                     Zapoznam się z Twoim opisem i postaram się odpowiedzieć tak szybko, jak to możliwe (zazwyczaj zajmuje mi to do 24 godzin).
-			//                 </p>
-
-			//                 <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #f0f0f0;">
-			//                     <p style="margin: 0; color: #2c3e50; font-weight: bold;">Pozdrawiam,</p>
-			//                     <p style="margin: 5px 0 0 0; color: #3498db; font-size: 18px; font-family: Georgia, serif;">Ewa Reluga</p>
-			//                 </div>
-			//             </div>
-
-			//             <div style="background-color: #f9f9f9; padding: 20px; text-align: center; font-size: 11px; color: #bdc3c7;">
-			//                 Nie odpowiadaj na tę wiadomość.
-			//             </div>
-			//         </div>
-			//     </div>
-			// `,
-			// }),
+			// Mail 2: Autoresponder do klienta
+			transporter.sendMail({
+				from: `"Biuro Rachunkowe Ewa Reluga" <${process.env.EMAIL_USER}>`,
+				to: email,
+				subject: 'Potwierdzenie otrzymania wiadomości',
+				headers: {
+					'Auto-Submitted': 'auto-generated',
+					'X-Entity-Ref-ID': `client-${Date.now()}`,
+				},
+				text: `Dzień dobry, ${firstName || 'Szanowny Kliencie'}!\n\nDziękuję za przesłanie formularza. Potwierdzam, że wiadomość dotarła bezpiecznie. Odpowiem najszybciej jak to możliwe.\n\nPozdrawiam,\nEwa Reluga`,
+				html: `
+                <div style="background-color: #fdfdfd; padding: 40px 20px; font-family: 'Segoe UI', Helvetica, Arial, sans-serif; line-height: 1.6;">
+                    <div style="max-width: 500px; margin: 0 auto; background: #ffffff; border: 1px solid #eeeeee; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.02);">
+                        <div style="height: 4px; background: linear-gradient(to right, #3498db, #2c3e50);"></div>
+                        <div style="padding: 40px 30px;">
+                            <h2 style="color: #2c3e50; margin-top: 0; font-size: 20px;">Dzień dobry, ${firstName || 'Szanowny Kliencie'}!</h2>
+                            <p style="color: #4f5f6f; font-size: 15px;">
+                                Dziękuję za przesłanie formularza i zainteresowanie moimi usługami. Potwierdzam, że Twoja wiadomość dotarła do mnie bezpiecznie.
+                            </p>
+                            <p style="color: #4f5f6f; font-size: 15px;">
+                                Zapoznam się z Twoim opisem i postaram się odpowiedzieć tak szybko, jak to możliwe (zazwyczaj zajmuje mi to do 24 godzin).
+                            </p>
+                            <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #f0f0f0;">
+                                <p style="margin: 0; color: #2c3e50; font-weight: bold;">Pozdrawiam,</p>
+                                <p style="margin: 5px 0 0 0; color: #3498db; font-size: 18px; font-family: Georgia, serif;">Ewa Reluga</p>
+                            </div>
+                        </div>
+                        <div style="background-color: #f9f9f9; padding: 20px; text-align: center; font-size: 11px; color: #bdc3c7;">
+                            Wiadomość wygenerowana automatycznie. Prosimy na nią nie odpowiadać.
+                        </div>
+                    </div>
+                </div>
+            `,
+			}),
 		]).then(results => {
 			results.forEach((result, idx) => {
 				if (result.status === 'rejected') {
@@ -142,11 +139,10 @@ app.post('/api/contact', contactLimiter, async (req, res) => {
 			})
 		})
 
-		// Zwracamy odpowiedź natychmiast bez czekania na SMTP
 		return res.status(200).json({ success: true, message: 'Wiadomość została wysłana!' })
 	} catch (error) {
 		console.error('Błąd wysyłania maila:', error)
-		res.status(500).json({ error: 'Nie udało się wysłać wiadomości.' })
+		res.status(500).json({ error: 'Nie udało się przetworzyć wiadomości.' })
 	}
 })
 
