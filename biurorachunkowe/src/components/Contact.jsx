@@ -1,6 +1,5 @@
-import React, { useState, useCallback } from 'react'
+import React, { useState } from 'react'
 import { RingLoader } from 'react-spinners'
-import { useGoogleReCaptcha } from 'react-google-recaptcha-v3'
 import phoneIcon from '../assets/icons/phoneIcon.svg'
 import mailIcon from '../assets/icons/mailIcon.svg'
 import locationIcon from '../assets/icons/locationIcon.svg'
@@ -11,10 +10,26 @@ import axios from 'axios'
 
 const contactData = {
 	contactInfo: [
-		{ icon: phoneIcon, title: 'Numer kontaktowy', value: '+48 884 905 771' },
-		{ icon: mailIcon, title: 'Adres e-mail', value: 'br-online@br-online.pl' },
-		{ icon: locationIcon, title: 'Lokalizacja biura', value: 'Laskowa 19, Grójec 05-600' },
-		{ icon: timeIcon, title: 'Godziny pracy', value: 'Pon-Czw: 8:00-16:00' },
+		{
+			icon: phoneIcon,
+			title: 'Numer kontaktowy',
+			value: '+48 884 905 771',
+		},
+		{
+			icon: mailIcon,
+			title: 'Adres e-mail',
+			value: 'br-online@br-online.pl',
+		},
+		{
+			icon: locationIcon,
+			title: 'Lokalizacja biura',
+			value: 'Laskowa 19, , Grójec 05-600',
+		},
+		{
+			icon: timeIcon,
+			title: 'Godziny pracy',
+			value: 'Pon-Czw: 7:00-15:00',
+		},
 	],
 }
 
@@ -25,9 +40,6 @@ export default function Contact() {
 	const [description, setDescription] = useState('')
 	const [statusMessage, setStatusMessage] = useState('')
 	const [isLoading, setIsLoading] = useState(false)
-
-	// Hak reCAPTCHA v3
-	const { executeRecaptcha } = useGoogleReCaptcha()
 
 	const handleSubmit = async e => {
 		e.preventDefault()
@@ -41,17 +53,8 @@ export default function Contact() {
 			return
 		}
 
-		// Sprawdzamy czy Google reCAPTCHA jest gotowe
-		if (!executeRecaptcha) {
-			setStatusMessage('System weryfikacji antyspamowej nie jest jeszcze gotowy. Odśwież stronę.')
-			return
-		}
-
 		try {
 			setIsLoading(true)
-
-			// Pobieramy token weryfikacyjny z Google dla akcji 'contact_form'
-			const recaptchaToken = await executeRecaptcha('contact_form')
 
 			const payload = {
 				firstName: firstName,
@@ -59,9 +62,9 @@ export default function Contact() {
 				phone: phone,
 				message: description,
 				subject: `Zgłoszenie od ${firstName}`,
-				recaptchaToken: recaptchaToken,
 			}
 
+			// Axios automatycznie wyśle to z nagłówkiem Content-Type: application/json
 			await axios.post('https://gold-cheetah-690946.hostingersite.com/api/contact', payload)
 
 			setStatusMessage('Wiadomość została wysłana pomyślnie!')
@@ -123,13 +126,9 @@ export default function Contact() {
 									target='_blank'
 									rel='noopener noreferrer'
 									className='inline-block'>
-									<img src={lkIcon} alt='LinkedIn' className='w-8 h-8' />
+									<img src={lkIcon} alt='Facebook' className='w-8 h-8' />
 								</a>
-								<a
-									href='https://www.iksiegowosc24.pl/'
-									target='_blank'
-									title='Biuro polecane przez iKsiegowosc24'
-									rel='noreferrer'>
+								<a href='https://www.iksiegowosc24.pl/' target='_blank' title='Biuro polecane przez iKsiegowosc24'>
 									<img
 										src='https://www.iksiegowosc24.pl/assets/logo-iksiegowosc24.svg'
 										alt='Biuro polecane przez iKsiegowosc24'
@@ -137,10 +136,11 @@ export default function Contact() {
 										height='75'
 									/>
 								</a>
+
 								<a
 									href='https://www.iksiegowosc24.pl/biura-rachunkowe/mazowieckie/grojec/biuro-rachunkowe-online-ewa-reluga'
 									target='_blank'
-									rel='noreferrer'>
+									alt='Zobacz nas w portalu'>
 									Zobacz nas w portalu
 								</a>
 							</div>
@@ -224,10 +224,20 @@ export default function Contact() {
 										maxLength={800}
 										aria-label='Treść wiadomości'
 										placeholder='Treść wiadomości...'
-										required></textarea>
+										required
+										onInput={e => {
+											const messageLength = document.getElementById('messageLength')
+											if (messageLength) {
+												messageLength.textContent = e.target.value.length
+											}
+										}}></textarea>
+									<div className='text-xs text-grayish mt-1 text-right'>
+										<span id='messageLength'>0</span>/800
+									</div>
 								</div>
 								<button
 									type='submit'
+									// disabled
 									disabled={isLoading}
 									className='w-full bg-gold text-grayish py-3 cursor-pointer rounded hover:bg-opacity-90 transition-colors disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2'
 									aria-label='Wyślij wiadomość'>
@@ -238,6 +248,7 @@ export default function Contact() {
 										</>
 									) : (
 										'Wyślij wiadomość'
+										// 'W trakcie przebudowy, proszę o kontakt mailowy tradycyjnie'
 									)}
 								</button>
 								{statusMessage && (

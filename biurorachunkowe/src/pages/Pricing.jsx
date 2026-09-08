@@ -13,7 +13,7 @@ export default function Pricing() {
 							<p className='max-w-[400px] mx-auto'>
 								Przedstawiony poniżej cennik nie stanowi oferty w rozumieniu art. 66, Kodeksu Cywilnego. Służy on do
 								wyliczenia kosztów współpracy z biurem. Podane ceny usług są cenami{' '}
-								<span className='font-semibold'>netto</span>.
+								<span className='font-semibold'>brutto</span>.
 							</p>
 						</div>
 					</div>

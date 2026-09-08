@@ -6,9 +6,9 @@ const ScrollToSection = () => {
 
 	useEffect(() => {
 		if (hash) {
-			const element = document.getElementById(hash.substring(1))
+			const element = document.getElementById(hash.substring(1)) // Usuwa "#" z początku
 			if (element) {
-				const yOffset = -84
+				const yOffset = -84 // Przesunięcie o wysokość nawigacji
 				const y = element.getBoundingClientRect().top + window.scrollY + yOffset
 				window.scrollTo({ top: y, behavior: 'smooth' })
 			}
