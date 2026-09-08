@@ -1,0 +1,40 @@
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # 1. WYMUSZENIE HTTPS ORAZ PRZEKIEROWANIE NA DOMENĘ BEZ WWW (LUB Z WWW)
+  # Zabezpiecza stronę certyfikatem SSL i zapobiega duplikacji treści w Google
+  RewriteCond %{HTTPS} off [OR]
+  RewriteCond %{HTTP_HOST} ^www\.(.*)$ [NC]
+  RewriteRule ^(.*)$ https://br-online.pl [L,R=301]
+
+  # 2. OBSŁUGA REACT ROUTER (POPRAWKA BŁĘDU 404)
+  # Jeśli żądany adres nie jest fizycznym plikiem ani folderem na serwerze,
+  # przekieruj ruch do index.html, aby React przejął mapowanie ścieżek
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{REQUEST_URI} !^/\.(well-known)
+  RewriteRule . /index.html [L]
+</IfModule>
+
+
+<IfModule mod_headers.c>
+  # Ukrywa informacje o technologii serwera
+  Header unset X-Powered-By
+  
+  # Blokuje próby osadzania Twojej strony w ramkach (Clickjacking)
+  Header set X-Frame-Options "SAMEORIGIN"
+  
+  # Blokuje próby manipulowania typami MIME (XSS Protection)
+  Header set X-Content-Type-Options "nosniff"
+  
+  # Włącza filtr XSS w przeglądarce klienta
+  Header set X-XSS-Protection "1; mode=block"
+  
+  # Wymusza połączenie HTTPS przez nagłówek HSTS (włącz dopiero gdy wszystko działa)
+  # Header set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+</IfModule>
+
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/json
+</IfModule>
