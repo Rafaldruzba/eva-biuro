@@ -83,7 +83,7 @@ app.post('/api/contact', contactLimiter, async (req, res) => {
 		Promise.allSettled([
 			// Mail do biura
 			transporter.sendMail({
-				from: `"Formularz Strony" br-online@br-online.pl`,
+				from: process.env.EMAIL_USER,
 				to: process.env.EMAIL_USER,
 				replyTo: email,
 				subject: subject || `Nowe zgłoszenie od ${firstName || 'Klienta'}`,
@@ -92,7 +92,7 @@ app.post('/api/contact', contactLimiter, async (req, res) => {
                 <div style="font-family: sans-serif; line-height: 1.5; color: #333;">
                     <h2 style="color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px;">Nowe zgłoszenie ze strony WWW</h2>
                     <p><strong>Imię:</strong> ${firstName || 'Nie podano'}</p>
-                    <p><strong>E-mail:</strong> <a href="mailto:${email}">${email}</a></p>
+                    <p><strong>E-mail:</strong> ${email}</p>
                     <p><strong>Telefon:</strong> ${phone || 'Nie podano'}</p>
                     <p><strong>Wiadomość:</strong></p>
                     <div style="background: #f9f9f9; padding: 15px; border-left: 4px solid #3498db; white-space: pre-wrap;">${message || 'Brak treści wiadomości.'}</div>
