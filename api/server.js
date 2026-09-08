@@ -83,7 +83,7 @@ app.post('/api/contact', contactLimiter, async (req, res) => {
 		Promise.allSettled([
 			// Mail do biura
 			transporter.sendMail({
-				from: `"Formularz Strony" <${process.env.EMAIL_USER}>`,
+				from: `"Formularz Strony" br-online@br-online.pl`,
 				to: process.env.EMAIL_USER,
 				replyTo: email,
 				subject: subject || `Nowe zgłoszenie od ${firstName || 'Klienta'}`,
