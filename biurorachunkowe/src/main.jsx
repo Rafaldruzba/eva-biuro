@@ -5,9 +5,9 @@ import './index.css'
 import App from './App.jsx'
 
 createRoot(document.getElementById('root')).render(
-	<GoogleReCaptchaProvider reCaptchaKey='6LchTbAtAAAAAOwRzJxWdWHgpY_HomUovJxSoceP'>
-		<StrictMode>
+	<StrictMode>
+		<GoogleReCaptchaProvider reCaptchaKey='6LchTbAtAAAAAOwRzJxWdWHgpY_HomUovJxSoceP'>
 			<App />
-		</StrictMode>
-	</GoogleReCaptchaProvider>,
+		</GoogleReCaptchaProvider>
+	</StrictMode>,
 )
