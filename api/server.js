@@ -61,22 +61,28 @@ app.post('/api/contact', contactLimiter, async (req, res) => {
 
 	try {
 		// 2. WERYFIKACJA RECAPTCHA V3 W GOOGLE
-		const googleVerifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${recaptchaToken}`
-		const googleRes = await axios.post(googleVerifyUrl)
+		const googleRes = await axios.post('https://www.google.com/recaptcha/api/siteverify', null, {
+			params: {
+				secret: process.env.RECAPTCHA_SECRET_KEY,
+				response: recaptchaToken,
+			},
+		})
 
 		// Odrzucamy boty (score poniżej 0.5 oznacza wysokie prawdopodobieństwo bota)
 		if (!googleRes.data.success || googleRes.data.score < 0.5) {
 			return res.status(400).json({ error: 'Weryfikacja antyspamowa nie powiodła się.' })
 		}
 
-		// 3. MAIL DO BIURA (Informacja o nowym kliencie)
-		await transporter.sendMail({
-			from: `"Formularz Strony" <${process.env.EMAIL_USER}>`,
-			to: process.env.EMAIL_USER,
-			replyTo: email,
-			subject: subject || `Nowe zgłoszenie od ${firstName || 'Klienta'}`,
-			text: `Masz nową wiadomość z formularza!\n\nImię: ${firstName || 'Nie podano'}\nE-mail: ${email}\nTelefon: ${phone || 'Nie podano'}\n\nWiadomość:\n${message || 'Brak treści wiadomości.'}`,
-			html: `
+		// Poczta wysyła się równolegle
+		Promise.allSettled([
+			// Mail do biura
+			transporter.sendMail({
+				from: `"Formularz Strony" <${process.env.EMAIL_USER}>`,
+				to: process.env.EMAIL_USER,
+				replyTo: email,
+				subject: subject || `Nowe zgłoszenie od ${firstName || 'Klienta'}`,
+				text: `Masz nową wiadomość z formularza!\n\nImię: ${firstName || 'Nie podano'}\nE-mail: ${email}\nTelefon: ${phone || 'Nie podano'}\n\nWiadomość:\n${message || 'Brak treści wiadomości.'}`,
+				html: `
                 <div style="font-family: sans-serif; line-height: 1.5; color: #333;">
                     <h2 style="color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px;">Nowe zgłoszenie ze strony WWW</h2>
                     <p><strong>Imię:</strong> ${firstName || 'Nie podano'}</p>
@@ -86,14 +92,13 @@ app.post('/api/contact', contactLimiter, async (req, res) => {
                     <div style="background: #f9f9f9; padding: 15px; border-left: 4px solid #3498db; white-space: pre-wrap;">${message || 'Brak treści wiadomości.'}</div>
                 </div>
             `,
-		})
-
-		// 4. MAIL DO KLIENTA (Automatyczne potwierdzenie)
-		await transporter.sendMail({
-			from: `"Biuro Rachunkowe Ewa Reluga" <${process.env.EMAIL_USER}>`,
-			to: email,
-			subject: 'Potwierdzenie otrzymania wiadomości',
-			html: `
+			}),
+			// Autoresponder do klienta
+			transporter.sendMail({
+				from: `"Biuro Rachunkowe Ewa Reluga" <${process.env.EMAIL_USER}>`,
+				to: email,
+				subject: 'Potwierdzenie otrzymania wiadomości',
+				html: `
                 <div style="background-color: #fdfdfd; padding: 40px 20px; font-family: 'Segoe UI', Helvetica, Arial, sans-serif; line-height: 1.6;">
                     <div style="max-width: 500px; margin: 0 auto; background: #ffffff; border: 1px solid #eeeeee; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.02);">
                         
@@ -123,9 +128,17 @@ app.post('/api/contact', contactLimiter, async (req, res) => {
                     </div>
                 </div>
             `,
+			}),
+		]).then(results => {
+			results.forEach((result, idx) => {
+				if (result.status === 'rejected') {
+					console.error(`Błąd podczas wysyłania e-maila nr ${idx + 1}:`, result.reason)
+				}
+			})
 		})
 
-		res.status(200).json({ success: true, message: 'Wiadomość została wysłana!' })
+		// Zwracamy odpowiedź natychmiast bez czekania na SMTP
+		return res.status(200).json({ success: true, message: 'Wiadomość została wysłana!' })
 	} catch (error) {
 		console.error('Błąd wysyłania maila:', error)
 		res.status(500).json({ error: 'Nie udało się wysłać wiadomości.' })
